@@ -32,10 +32,11 @@ ENV CGO_ENABLED 1
 RUN git config --global advice.detachedHead false &&  \
     git clone --quiet --no-checkout https://github.com/heroiclabs/nakama.git /go/src/github.com/heroiclabs/nakama
 
+  
 RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
 
 RUN go get github.com/pebbe/zmq4
-
+RUN go get -u "github.com/heroiclabs/nakama-common"; exit 0
 
 WORKDIR /go/src/github.com/heroiclabs/nakama
 RUN git checkout --quiet "$commit"

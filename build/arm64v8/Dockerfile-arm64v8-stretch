@@ -36,7 +36,7 @@ WORKDIR /go/src/github.com/heroiclabs/nakama
 
 RUN git checkout $version 
 
-RUN env CGO_ENABLED=1 go build
+RUN env CGO_ENABLED=1 go build -gcflags "-trimpath $PWD" -asmflags "-trimpath $PWD" -ldflags "-s -w -X main.version=$version -X main.commitID=$commit"
 
 WORKDIR /nakama/
 
