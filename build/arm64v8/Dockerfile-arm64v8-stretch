@@ -28,6 +28,10 @@ RUN mkdir -p /nakama/data/modules
 
 RUN go get -d github.com/heroiclabs/nakama
 
+RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
+
+RUN go get github.com/pebbe/zmq4
+
 WORKDIR /go/src/github.com/heroiclabs/nakama
 
 RUN git checkout $version 
