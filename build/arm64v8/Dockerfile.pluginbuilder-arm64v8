@@ -14,7 +14,7 @@
 
 # to build pluginbuilder docker-image for version 2.6.0
 # docker build "$PWD" --file ./Dockerfile.pluginbuilder-arm64v8 --build-arg commit="v2.6.0" --build-arg version=v2.6.0 -t arm64v8/nakama-pluginbuilder:2.6.0
-FROM arm64v8/golang:1.12.9-stretch 
+FROM arm64v8/golang:1.13.3-stretch 
 
 MAINTAINER Heroic Labs <support@heroiclabs.com>
 
@@ -33,10 +33,10 @@ RUN git config --global advice.detachedHead false &&  \
     git clone --quiet --no-checkout https://github.com/heroiclabs/nakama.git /go/src/github.com/heroiclabs/nakama
 
   
-RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
+#RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
 
-RUN go get github.com/pebbe/zmq4
-RUN go get -u "github.com/heroiclabs/nakama-common"; exit 0
+#RUN go get github.com/pebbe/zmq4
+#RUN go get -u "github.com/heroiclabs/nakama-common"; exit 0
 
 WORKDIR /go/src/github.com/heroiclabs/nakama
 RUN git checkout --quiet "$commit"
