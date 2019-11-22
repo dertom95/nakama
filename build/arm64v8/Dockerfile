@@ -12,10 +12,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-# to build pluginbuilder docker-image for version 2.6.0
-# docker build "$PWD" --file ./Dockerfile.pluginbuilder-arm64v8 --build-arg commit="v2.6.0" --build-arg version=v2.6.0 -t arm64v8/nakama-pluginbuilder:2.6.0
-#FROM arm64v8/golang:1.13.3-stretch 
-FROM dertom95/nakama:2.7.0-saalis-arm64v8
+# docker build "$PWD" --file ./Dockerfile.pluginbuilder --build-arg commit="$(git rev-parse --short HEAD)" --build-arg version=v2.1.1 -t heroiclabs/nakama-pluginbuilder:2.1.1
+# docker build "$PWD" --file ./Dockerfile.pluginbuilder --build-arg commit="$(git rev-parse --short HEAD)" --build-arg version="v2.1.1-$(git rev-parse --short HEAD)" -t heroiclabs/nakama-prerelease:"2.1.1-$(git rev-parse --short HEAD)"
+
+FROM arm64v8/golang:1.13.3-alpine3.10 as builder
 
 MAINTAINER Heroic Labs <support@heroiclabs.com>
 
@@ -27,17 +27,12 @@ LABEL variant=nakama-pluginbuilder
 LABEL description="A support container to build Go code for Nakama server's runtime."
 
 ENV GOOS linux
-ENV GOARCH arm64 
+ENV GOARCH arm64
 ENV CGO_ENABLED 1
 
-RUN git config --global advice.detachedHead false &&  \
+RUN apk --no-cache add ca-certificates gcc binutils-gold build-base musl-dev git && \
+    git config --global advice.detachedHead false && \
     git clone --quiet --no-checkout https://github.com/heroiclabs/nakama.git /go/src/github.com/heroiclabs/nakama
-
-  
-#RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
-
-#RUN go get github.com/pebbe/zmq4
-#RUN go get -u "github.com/heroiclabs/nakama-common"; exit 0
 
 WORKDIR /go/src/github.com/heroiclabs/nakama
 RUN git checkout --quiet "$commit"

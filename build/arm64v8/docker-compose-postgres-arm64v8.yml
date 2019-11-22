@@ -13,7 +13,7 @@ services:
     environment:
       - POSTGRES_DB="nakama"
     volumes:
-      - /path/to/postgres/datafolder:/var/lib/postgresql/data
+      - /home/ttrocha/temp/pg-0:/var/lib/postgresql/data
     expose:
       - "8080"
       - "5432"
@@ -22,7 +22,7 @@ services:
       - "8080:8080"
   nakama:
     container_name: nakama
-    image: arm64v8/nakama:v2.6.0
+    image: dertom95/nakama:v2.7.0-saalis-arm64v8
     entrypoint:
       - "/bin/sh"
       - "-ecx"

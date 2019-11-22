@@ -1,0 +1,58 @@
+## Copyright 2018 The Nakama Authors
+##
+## Licensed under the Apache License, Version 2.0 (the "License");
+## you may not use this file except in compliance with the License.
+## You may obtain a copy of the License at
+##
+## http:##www.apache.org/licenses/LICENSE-2.0
+##
+## Unless required by applicable law or agreed to in writing, software
+## distributed under the License is distributed on an "AS IS" BASIS,
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+## See the License for the specific language governing permissions and
+## limitations under the License.
+
+# To build nakama-server version 2.6.0:
+# docker build . --build-arg version="v2.6.0" -t arm64v8/nakama:2.6.0 -f Dockerfile-arm64v8-stretch
+FROM arm64v8/golang:1.13.3-stretch
+
+MAINTAINER Heroic Labs <support@heroiclabs.com>
+
+ARG version
+
+ENV GOOS linux
+ENV GOARCH arm64 
+ENV CGO_ENABLED 1
+
+LABEL version=$version
+LABEL variant=nakama
+LABEL description="Distributed server for social and realtime games and apps."
+
+RUN mkdir -p /nakama/data/modules 
+
+#RUN go get -d gitihub.com/heroiclabs/nakama
+
+RUN apt-get update && apt-get install -y ca-certificates gcc musl-dev git && \
+    git config --global advice.detachedHead false && \
+    git clone --quiet --no-checkout https://github.com/heroiclabs/nakama /go/src/github.com/heroiclabs/nakama
+
+#RUN apt-get update && apt-get install -y libsodium-dev libczmq-dev && go get github.com/zeromq/goczmq
+
+#RUN go get github.com/pebbe/zmq4
+
+WORKDIR /go/src/github.com/heroiclabs/nakama
+
+RUN git checkout $version 
+
+RUN env CGO_ENABLED=1 go build -gcflags "-trimpath $PWD" -asmflags "-trimpath $PWD" -ldflags "-s -w -X main.version=$version -X main.commitID=$commit"
+
+WORKDIR /nakama/
+
+RUN cp /go/src/github.com/heroiclabs/nakama/nakama .
+
+EXPOSE 7349 7350 7351
+
+ENTRYPOINT ["/sbin/tini", "--", "/nakama/nakama"]
+
+HEALTHCHECK --interval=5m --timeout=3s \
+  CMD curl -f http://localhost:7350/ || exit 1
